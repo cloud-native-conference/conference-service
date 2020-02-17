@@ -17,9 +17,18 @@ type ConferenceService struct {
 	DatabaseClient data.DatabaseClient
 }
 
-func (sevice *ConferenceService) GetConference(uniqueName string) (*Conference, error) {
+func (service *ConferenceService) GetConference(uniqueName string) (*Conference, error) {
 	log.Printf("Get Conference; uniqueId: %s", uniqueName)
-	return nil, fmt.Errorf("Could not find conference with uniqueId: %s", uniqueName)
+	conferenceData, err := service.DatabaseClient.GetConference(uniqueName)
+	if err != nil {
+		return nil, fmt.Errorf("Could not get conference with uniqueName %s: %w", uniqueName, err)
+	}
+	conference := &Conference{
+		UniqueName:  conferenceData.UniqueName,
+		DisplayName: conferenceData.DisplayName,
+		Description: conferenceData.Description,
+	}
+	return conference, nil
 }
 
 func (service *ConferenceService) UpdateConference(conference *Conference) (*Conference, error) {

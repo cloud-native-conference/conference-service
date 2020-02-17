@@ -42,7 +42,21 @@ func New(mongoServerUrl string) (*MongoClient, error) {
 }
 
 func (client *MongoClient) GetConference(uniqueName string) (*ConferenceStorageModel, error) {
-	return nil, nil
+	collection := client.client.Database(DATABASE).Collection(COLLECTION)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	filter := &bson.M{"uniqueName": uniqueName}
+	result := collection.FindOne(ctx, filter)
+	err := result.Err()
+	if err != nil {
+		return nil, fmt.Errorf("Could not find conference with uniqueName %s: %w", uniqueName, err)
+	}
+	var conference ConferenceStorageModel
+	err = result.Decode(&conference)
+	if err != nil {
+		return nil, fmt.Errorf("Could not decode conference with uniqueName %s: %w", uniqueName, err)
+	}
+	return &conference, nil
 }
 func (client *MongoClient) UpdateConference(conference *ConferenceStorageModel) error {
 	return nil
