@@ -12,7 +12,7 @@ import (
 
 const (
 	MONGO_SERVER_URL_ENV_VAR_NAME = "MONGO_SERVER_URL"
-	LISTENING_PORT                = "8080"
+	LISTENING_PORT                = "5000"
 )
 
 var MONGO_SERVER_URL = "mongodb://localhost:27017"

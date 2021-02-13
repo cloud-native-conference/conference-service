@@ -8,6 +8,7 @@ type ConferenceStorageModel struct {
 
 type DatabaseClient interface {
 	GetConference(uniqueName string) (*ConferenceStorageModel, error)
+	GetConferences() ([]*ConferenceStorageModel, error)
 	UpdateConference(conference *ConferenceStorageModel) error
 	CreateConference(conference *ConferenceStorageModel) error
 }

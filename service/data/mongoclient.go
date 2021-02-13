@@ -41,6 +41,36 @@ func New(mongoServerUrl string) (*MongoClient, error) {
 	return &MongoClient{client}, nil
 }
 
+func (client *MongoClient) GetConferences() ([]*ConferenceStorageModel, error) {
+	collection := client.client.Database(DATABASE).Collection(COLLECTION)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	findOptions := options.Find()
+	findOptions.SetLimit(10)
+	conferences := make([]*ConferenceStorageModel, 0, 10)
+	cursor, err := collection.Find(ctx, bson.D{{}}, findOptions)
+	defer func() {
+		if err := cursor.Close(ctx); err != nil {
+			log.Println(fmt.Errorf("Could not find any conferences: %w", err))
+		}
+	}()
+	if err != nil {
+		return nil, fmt.Errorf("Could not find any conferences: %w", err)
+	}
+	for cursor.Next(ctx) {
+		var conference ConferenceStorageModel
+		err := cursor.Decode(&conference)
+		if err != nil {
+			return nil, fmt.Errorf("Could not decode conference: %w", err)
+		}
+		conferences = append(conferences, &conference)
+	}
+	if err := cursor.Err(); err != nil {
+		return nil, fmt.Errorf("Could not load conferences: %w", err)
+	}
+	return conferences, nil
+}
+
 func (client *MongoClient) GetConference(uniqueName string) (*ConferenceStorageModel, error) {
 	collection := client.client.Database(DATABASE).Collection(COLLECTION)
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)

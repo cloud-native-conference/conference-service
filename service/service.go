@@ -17,6 +17,23 @@ type ConferenceService struct {
 	DatabaseClient data.DatabaseClient
 }
 
+func (service *ConferenceService) GetConferences() ([]*Conference, error) {
+	conferenceData, err := service.DatabaseClient.GetConferences()
+	if err != nil {
+		return nil, fmt.Errorf("Could not get conferences: %w", err)
+	}
+	conferences := make([]*Conference, len(conferenceData))
+	for i, conference := range conferenceData {
+		conferences[i] = &Conference{
+			UniqueName:  conference.UniqueName,
+			DisplayName: conference.DisplayName,
+			Description: conference.Description,
+		}
+
+	}
+	return conferences, nil
+}
+
 func (service *ConferenceService) GetConference(uniqueName string) (*Conference, error) {
 	log.Printf("Get Conference; uniqueId: %s", uniqueName)
 	conferenceData, err := service.DatabaseClient.GetConference(uniqueName)

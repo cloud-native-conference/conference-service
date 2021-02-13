@@ -13,6 +13,7 @@ func ListenAndServe(listeningPort string, controller *Controller) error {
 }
 
 func RegisterHandlers(router *httprouter.Router, controller *Controller) {
+	router.GET("/", controller.getConferences)
 	router.GET("/:uniqueName", controller.getConference)
 	router.POST("/", controller.createConference)
 }
